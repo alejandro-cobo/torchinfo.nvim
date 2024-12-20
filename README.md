@@ -10,9 +10,9 @@ Using lazy.nvim:
 { "alejandro-cobo/torchinfo.nvim", name = "torchinfo" }
 ```
 
-In order for the plugin to work, the ```PYTHONPATH``` environment variable must
-point to a python installation with all your required packages installed,
-including [Pytorch](https://pytorch.org/).
+In order for the plugin to work, the ```python``` command must point to a python
+installation with all your required packages installed, including
+[Pytorch](https://pytorch.org/).
 
 If you are using a virtual environment (which is recommended), this means that
 you must run ```source <venv/bin/activate>``` or similar before launching Neovim.
@@ -71,7 +71,7 @@ class ModuleB(nn.Module):
 ```
 
 ModuleA will be ignored while ModuleB will be successfully analyzed. You can
-temporally add default values to any module you want to include in the analysis.
+temporally add default values to any module to include it in the analysis.
 
 ## Potential future features
 
