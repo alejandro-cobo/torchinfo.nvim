@@ -12,15 +12,15 @@ Using lazy.nvim:
 
 In order for the plugin to work, the ```PYTHONPATH``` environment variable must
 point to a python installation with all your required packages installed,
-including at least [Pytorch](https://pytorch.org/).
+including [Pytorch](https://pytorch.org/).
 
 If you are using a virtual environment (which is recommended), this means that
-you must ```source <venv/bin/activate>``` or similar before launching Neovim.
+you must run ```source <venv/bin/activate>``` or similar before launching Neovim.
 
 ## Usage
 
-This plugins exports a function called ```get_info``` which accepts a file path
-as an argument. You can run this function inside neovim. For example, to
+This plugin exports a function called ```get_info``` which accepts a python file
+path as an argument. You can run this function inside Neovim. For example, to
 pass the current file:
 
 ```
@@ -43,8 +43,9 @@ You can also define a keymap to make this process easier:
 }
 ```
 
-This plugins imports all the ```torch.nn.Module``` classes and tries to instantiate
-them. This means that only classes with defined default parameters are selected.
+This plugin imports all the ```torch.nn.Module``` classes from the input file
+and tries to instantiate them. This means that only classes with defined
+default parameters are selected.
 
 For example, given the following python file:
 ```python
@@ -69,8 +70,8 @@ class ModuleB(nn.Module):
         return self.fc(x)
 ```
 
-ModuleA will be ignored. You can temporally add default values to any module
-you want to process.
+ModuleA will be ignored while ModuleB will be successfully analyzed. You can
+temporally add default values to any module you want to include in the analysis.
 
 ## Potential future features
 
