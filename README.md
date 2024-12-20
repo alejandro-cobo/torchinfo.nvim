@@ -77,7 +77,7 @@ temporally add default values to any module to include it in the analysis.
 
 - [x] Get a minimal version of the plugin working.
 - [x] Explore other ways of showing information other than cmdline messages.
-- [ ] Use concurrency to run the script in background.
+- [x] Use concurrency to run the script in background.
 - [ ] Output more info other than number of parameters, such as FLOPs.
 - [ ] Output a graph showing module connections.
 
