@@ -72,11 +72,11 @@ class ModuleB(nn.Module):
 ModuleA will be ignored. You can temporally add default values to any module
 you want to process.
 
-## To-do list
+## Potential future features
 
 - [x] Get a minimal version of the plugin working.
-- [ ] Use concurrency to run the analysis in background.
-- [ ] Explore other ways of showing information other than cmdline messages.
+- [x] Explore other ways of showing information other than cmdline messages.
+- [ ] Use concurrency to run the script in background.
 - [ ] Output more info other than number of parameters, such as FLOPs.
 - [ ] Output a graph showing module connections.
 
