@@ -24,7 +24,10 @@ end
 
 M.get_info = function(file_path)
     local script_path = python_script_path()
-    vim.cmd("!python " .. script_path .. " " .. file_path)
+    local ret = vim.api.nvim_exec2("!python " .. script_path .. " " .. file_path, {output=true})
+    local ret_stdout = ret["output"]
+    ret_stdout = ret_stdout:sub(ret_stdout:find("\n"), -1)
+    vim.api.nvim_echo({{ret_stdout}}, true, {})
 end
 
 return M

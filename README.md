@@ -36,7 +36,9 @@ You can also define a keymap to make this process easier:
     config = function()
         local torchinfo = require("torchinfo")
         -- Get info from current file
-        vim.keymap.set("n", "<leader>ti", torchinfo.get_info(vim.fn.expand("%")))
+        vim.keymap.set("n", "<leader>ti", function()
+            torchinfo.get_info(vim.fn.expand("%"))
+        end)
     end
 }
 ```
