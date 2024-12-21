@@ -25,8 +25,12 @@ local function create_window(num_lines)
     local width = stats.width;
     local height = stats.height;
 
+    if num_lines > height then
+        num_lines = height
+    end
+
     local buf = vim.api.nvim_create_buf(false, true)
-    vim.api.nvim_open_win(buf, true, {
+    vim.api.nvim_open_win(buf, false, {
         relative="editor",
         width = width,
         height = num_lines,
@@ -36,7 +40,7 @@ local function create_window(num_lines)
     return buf
 end
 
-local function get_info(file_path)
+local function get_info(args)
     local script_path = python_script_path()
     local output = {}
     local uv = vim.uv
@@ -44,7 +48,7 @@ local function get_info(file_path)
     local stderr = uv.new_pipe(false)
     local handle
     handle, _ = uv.spawn("python", {
-        args = {script_path, file_path},
+        args = {script_path, args.file_path, "--gpu", args.gpu or -1},
         stdio = { nil, stdout, stderr }
     },
     vim.schedule_wrap(function()
@@ -54,7 +58,9 @@ local function get_info(file_path)
         stderr:close()
         handle:close()
         local buf = create_window(#output)
-        vim.api.nvim_put(output, "", false, false)
+        vim.api.nvim_buf_call(buf, function()
+            vim.api.nvim_put(output, "", false, false)
+        end)
         vim.api.nvim_buf_set_option(buf, "modifiable", false)
     end))
 
