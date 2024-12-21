@@ -29,11 +29,13 @@ def get_module_from_file(file_path: str) -> ModuleType:
 
 
 def num_to_str(num: float, fmt: str = '%.2f') -> str:
-    for metric in ['', 'K', 'M', 'B']:
-        if num / 1000 < 1:
-            return fmt % num + metric
+    if num < 1000:
+        return fmt % num
+    for metric in ['K', 'M', 'B']:
         num /= 1000
-    return fmt % num + 'B'
+        if num < 1000:
+            break
+    return fmt % num + metric
 
 
 def get_num_params(module: nn.Module) -> int:
@@ -41,14 +43,14 @@ def get_num_params(module: nn.Module) -> int:
     return num_params
 
 
-def get_flops(model, gpu: int) -> int:
+def get_flops(module: nn.Module, gpu: int) -> int:
     device = 'cpu' if gpu < 0 else gpu
-    model = model.to(device)
-    model.eval()
-    input = torch.randn(model.input_shape).to(device)
-    flop_counter = FlopCounterMode(mods=model, display=False, depth=None)
+    module = module.to(device)
+    module.eval()
+    input = torch.randn(module.input_shape).to(device)
+    flop_counter = FlopCounterMode(mods=module, display=False, depth=None)
     with flop_counter:
-        model(input)
+        module(input)
     return flop_counter.get_total_flops()
 
 
@@ -63,7 +65,7 @@ def print_symbol_info(symbol: Any, gpu: int) -> None:
         info = num_to_str(num_params) + ' params'
         if hasattr(symbol, 'input_shape'):
             flops = get_flops(symbol, gpu)
-            info += ', ' + num_to_str(flops) + ' FLOPS'
+            info += ', ' + num_to_str(flops) + ' FLOPs'
         print(f'{symbol.__class__.__name__}: {info}')
 
 

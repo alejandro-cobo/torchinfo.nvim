@@ -4,22 +4,26 @@
 This plugin takes a python source code file and outputs information about each
 torch.nn.Module class defined in it, such as number of parameters and FLOPs.
 
-                                                          *torchinfo.get_info*
-torchinfo.get_info({opts})
+torchinfo.setup({opts})                                      *torchinfo.setup*
 
-    Import a python source file and outputs info about each torch.nn.Module
+    Parameters: ~
+        {opts} (table)  Plugin configuration options.
+                        - focus_win {boolean} Set to true to move the cursor to
+                          the resuls window, or false to keep the focus on the
+                          editor window. Default: false.
+                        - gpu {int} Set to a negative number to use the CPU
+                          for computing FLOPs, or a positive number to use
+                          the corresponding GPU id. Default: -1.
+
+torchinfo.get_info({file_path})                           *torchinfo.get_info*
+
+    Import a python source file and output info about each torch.nn.Module
     defined inside. This is done asynchronously. When the output is ready,
-    a new window is created at the bottom of the screen with the results. >
-
-        torchinfo.get_info({
-            file_path="path/to/python/file.py",
-            gpu=0
-        })
+    a new window is created at the bottom of the screen with the results.
+>
+        torchinfo.get_info("path/to/python/file.py")
 <
     Parameters: ~
-        {opts} (table)  Input arguments:
-                        - "file_path" (string) Path to a python file.
-                        - "gpu" (int) GPU id to compute FLOPs. Use a negative
-                          number to use the CPU. Default value is -1 (CPU).
+        {file_path} (string)  Path to python file.
 
 vim:tw=78:ts=8:ft=help:norl:

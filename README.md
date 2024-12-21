@@ -22,7 +22,7 @@ path as an argument. You can run this function inside Neovim. For example, to
 pass the current file:
 
 ```
-:lua require("torchinfo").get_info({file_path=vim.fn.expand("%")})
+:lua require("torchinfo").get_info(vim.fn.expand("%"))
 ```
 
 You can also define a keymap to make this process easier:
@@ -35,14 +35,13 @@ You can also define a keymap to make this process easier:
         local torchinfo = require("torchinfo")
         -- Get info from current file
         vim.keymap.set("n", "<leader>ti", function()
-            torchinfo.get_info({file_path=vim.fn.expand("%")})
+            torchinfo.get_info(vim.fn.expand("%"))
         end)
     end
 }
 ```
 
-Finally, if you want to use a GPU instead of the CPU for computing the FLOPs of
-a model:
+The ```setup``` method lets you configure the behavior of the plugin:
 
 ```lua
 {
@@ -50,9 +49,15 @@ a model:
     name = "torchinfo",
     config = function()
         local torchinfo = require("torchinfo")
+        torchinfo.setup({
+            -- Focus the results window
+            focus_win=true,
+            -- Use the GPU with id 0
+            gpu=0
+        })
         -- Get info from current file
         vim.keymap.set("n", "<leader>ti", function()
-            torchinfo.get_info({file_path=vim.fn.expand("%"), gpu=0})
+            torchinfo.get_info(vim.fn.expand("%"))
         end)
     end
 }
