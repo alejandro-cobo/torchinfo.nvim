@@ -41,7 +41,7 @@ You can also define a keymap to make this process easier:
 }
 ```
 
-Finally, if you want to use a GPU insted of the CPU for computing the FLOPs of
+Finally, if you want to use a GPU instead of the CPU for computing the FLOPs of
 a model:
 
 ```lua
