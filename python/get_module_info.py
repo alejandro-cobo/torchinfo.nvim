@@ -31,7 +31,7 @@ def get_module_from_file(file_path: str) -> ModuleType:
 def num_to_str(num: float, fmt: str = '%.2f') -> str:
     if num < 1000:
         return fmt % num
-    for metric in ['K', 'M', 'B']:
+    for metric in ['K', 'M', 'G', 'B']:
         num /= 1000
         if num < 1000:
             break

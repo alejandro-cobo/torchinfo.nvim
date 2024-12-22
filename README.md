@@ -2,6 +2,8 @@
 
 Show information about Pytorch modules inside Neovim.
 
+![sample](./samples/sample.gif)
+
 ## Installation
 
 Using lazy.nvim:
