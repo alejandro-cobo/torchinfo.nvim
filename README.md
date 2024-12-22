@@ -55,7 +55,9 @@ The ```setup``` method lets you configure the behavior of the plugin:
             -- Focus the results window
             focus_win=true,
             -- Use the GPU with id 0
-            gpu=0
+            gpu=0,
+            -- Show info about children modules
+            detailed=true
         })
         -- Get info from current file
         vim.keymap.set("n", "<leader>ti", function()

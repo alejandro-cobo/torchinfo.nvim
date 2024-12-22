@@ -14,6 +14,8 @@ torchinfo.setup({opts})                                      *torchinfo.setup*
                         - gpu {int} Set to a negative number to use the CPU
                           for computing FLOPs, or a positive number to use
                           the corresponding GPU id. Default: -1.
+                        - detailed {boolean} If true, show info about direct
+                          children modules too. Default: false.
 
 torchinfo.get_info({file_path})                           *torchinfo.get_info*
 

@@ -15,6 +15,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument('file_path', type=str, help='Path to python file')
     parser.add_argument('--gpu', type=int, default=-1, help='GPU id to use to compute FLOPs')
+    parser.add_argument('--detailed', action='store_true', help='Show information about children modules too.')
     args = parser.parse_args(argv)
     return args
 
@@ -29,13 +30,11 @@ def get_module_from_file(file_path: str) -> ModuleType:
 
 
 def num_to_str(num: float, fmt: str = '%.2f') -> str:
-    if num < 1000:
-        return fmt % num
-    for metric in ['K', 'M', 'G', 'B']:
-        num /= 1000
+    for metric in ('', 'K', 'M', 'G'):
         if num < 1000:
-            break
-    return fmt % num + metric
+            return fmt % num + metric
+        num /= 1000
+    return fmt % (num * 1000) + metric
 
 
 def get_num_params(module: nn.Module) -> int:
@@ -54,19 +53,24 @@ def get_flops(module: nn.Module, gpu: int) -> int:
     return flop_counter.get_total_flops()
 
 
-def print_symbol_info(symbol: Any, gpu: int) -> None:
+def print_symbol_info(symbol: Any, gpu: int, detailed: bool, indent_level: int = 0) -> None:
     if inspect.isclass(symbol):
         try:
             symbol = symbol()
         except TypeError:
             return
+
     if isinstance(symbol, nn.Module):
         num_params = get_num_params(symbol)
         info = num_to_str(num_params) + ' params'
         if hasattr(symbol, 'input_shape'):
             flops = get_flops(symbol, gpu)
             info += ', ' + num_to_str(flops) + ' FLOPs'
-        print(f'{symbol.__class__.__name__}: {info}')
+        print(' ' * indent_level + f'{symbol.__class__.__name__}: {info}')
+
+        if detailed:
+            for module in symbol.children():
+                print_symbol_info(module, gpu, False, 4)
 
 
 def main(argv) -> None:
@@ -79,7 +83,7 @@ def main(argv) -> None:
         if symbol.startswith('_'):
             continue
         symbol = getattr(module, symbol)
-        print_symbol_info(symbol, args.gpu)
+        print_symbol_info(symbol, args.gpu, args.detailed)
 
 
 if __name__ == '__main__':

@@ -39,5 +39,11 @@ luac.out
 *.x86_64
 *.hex
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Vim docs
 doc/tags
 

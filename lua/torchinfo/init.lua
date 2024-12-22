@@ -4,18 +4,25 @@ local utils = require("torchinfo.utils")
 local torchinfo = {
     _config = {
         focus_win = false,
-        gpu = -1
+        gpu = -1,
+        detailed = false
     }
 }
 
 function torchinfo.get_info(file_path)
     local script_path = utils.python_script_path()
+
+    local args = {script_path, file_path, "--gpu", torchinfo._config.gpu}
+    if torchinfo._config.detailed then
+        table.insert(args, "--detailed")
+    end
+
     local output = {}
     local stdout = uv.new_pipe(false)
     local stderr = uv.new_pipe(false)
     local handle
     handle, _ = uv.spawn("python", {
-        args = {script_path, file_path, "--gpu", torchinfo._config.gpu},
+        args = args,
         stdio = {nil, stdout, stderr}
     },
     vim.schedule_wrap(function()
@@ -53,6 +60,7 @@ function torchinfo.setup(opts)
     opts = opts or {}
     torchinfo._config.focus_win = opts.focus_win
     torchinfo._config.gpu = opts.gpu or -1
+    torchinfo._config.detailed = opts.detailed
 end
 
 return torchinfo
