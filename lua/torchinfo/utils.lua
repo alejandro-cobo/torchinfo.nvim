@@ -21,10 +21,14 @@ function M.python_script_path()
     return path .. sep .. "python" .. sep .. "get_module_info.py"
 end
 
-function M.create_window(num_lines, enter)
+function M.create_window(lines, title, enter)
+    local num_lines = #lines
+    if num_lines == 0 then
+        return
+    end
+
     local width = vim.o.columns
     local height = vim.o.lines
-
     if num_lines > height then
         num_lines = height
     end
@@ -34,6 +38,7 @@ function M.create_window(num_lines, enter)
         relative = "editor",
         style = "minimal",
         border = "rounded",
+        title = title,
         width = width,
         height = num_lines,
         col = 1,
@@ -42,6 +47,9 @@ function M.create_window(num_lines, enter)
     vim.keymap.set("n", "q", function()
         vim.api.nvim_win_close(win, true)
     end, { buffer = buf })
+
+    vim.api.nvim_buf_set_lines(buf, 0, -1, true, lines)
+    vim.api.nvim_set_option_value("modifiable", false, { buf = buf })
     return buf
 end
 

@@ -18,6 +18,7 @@ function M.get_info(file_path)
     end
 
     local output = {}
+    local error = {}
     local stdout = uv.new_pipe(false)
     local stderr = uv.new_pipe(false)
     local handle
@@ -25,17 +26,18 @@ function M.get_info(file_path)
         args = args,
         stdio = {nil, stdout, stderr}
     },
-        vim.schedule_wrap(function()
+        vim.schedule_wrap(function(code, _)
             stdout:read_stop()
             stderr:read_stop()
             stdout:close()
             stderr:close()
             handle:close()
-            local buf = utils.create_window(#output, config.focus_win)
-            vim.api.nvim_buf_call(buf, function()
-                vim.api.nvim_put(output, "", false, false)
-            end)
-            vim.api.nvim_buf_set_option(buf, "modifiable", false)
+
+            if code == 0 then
+                utils.create_window(output, "Output", config.focus_win)
+            else
+                utils.create_window(error, "Error", true)
+            end
         end)
     )
 
@@ -51,7 +53,9 @@ function M.get_info(file_path)
     uv.read_start(stderr, function(err, data)
         assert(not err, err)
         if data then
-            print("torchinfo error:", data)
+            for line in data:gmatch("([^\n]+)") do
+                table.insert(error, line)
+            end
         end
     end)
     uv.run("once")
