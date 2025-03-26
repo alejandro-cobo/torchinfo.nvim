@@ -22,24 +22,27 @@ function M.python_script_path()
 end
 
 function M.create_window(num_lines, enter)
-    local stats = vim.api.nvim_list_uis()[1]
-    local width = stats.width;
-    local height = stats.height;
+    local width = vim.o.columns
+    local height = vim.o.lines
 
     if num_lines > height then
         num_lines = height
     end
 
     local buf = vim.api.nvim_create_buf(false, true)
-    vim.api.nvim_open_win(buf, enter, {
+    local win = vim.api.nvim_open_win(buf, enter, {
         relative = "editor",
+        style = "minimal",
+        border = "rounded",
         width = width,
         height = num_lines,
         col = 1,
         row = height - num_lines,
     })
+    vim.keymap.set("n", "q", function()
+        vim.api.nvim_win_close(win, true)
+    end, { buffer = buf })
     return buf
 end
 
 return M
-

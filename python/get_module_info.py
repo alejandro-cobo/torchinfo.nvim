@@ -1,8 +1,8 @@
 import argparse
 import importlib
 import inspect
-import os
 import sys
+from pathlib import Path
 from types import ModuleType
 from typing import Any
 
@@ -14,17 +14,25 @@ from torch.utils.flop_counter import FlopCounterMode
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument('file_path', type=str, help='Path to python file')
-    parser.add_argument('--gpu', type=int, default=-1, help='GPU id to use to compute FLOPs')
-    parser.add_argument('--detailed', action='store_true', help='Show information about children modules too.')
+    parser.add_argument(
+        '--gpu',
+        type=int,
+        default=-1,
+        help='GPU id to use to compute FLOPs'
+    )
+    parser.add_argument(
+        '--detailed',
+        action='store_true',
+        help='Show information about children modules too.'
+    )
     args = parser.parse_args(argv)
     return args
 
 
 def get_module_from_file(file_path: str) -> ModuleType:
-    root_path = os.path.abspath(os.path.curdir)
-    sys.path.insert(0, root_path)
-    module_name = file_path.replace(os.path.sep, '.')
-    module_name = os.path.splitext(module_name)[0]
+    sys.path.insert(0, str(Path.cwd()))
+    parts = Path(file_path).with_suffix('').parts
+    module_name = '.'.join(parts)
     module = importlib.import_module(module_name)
     return module
 
@@ -53,7 +61,12 @@ def get_flops(module: nn.Module, gpu: int) -> int:
     return flop_counter.get_total_flops()
 
 
-def print_symbol_info(symbol: Any, gpu: int, detailed: bool, indent_level: int = 0) -> None:
+def print_symbol_info(
+    symbol: Any,
+    gpu: int,
+    detailed: bool,
+    indent_level: int = 0
+) -> None:
     if inspect.isclass(symbol):
         try:
             symbol = symbol()
@@ -62,7 +75,7 @@ def print_symbol_info(symbol: Any, gpu: int, detailed: bool, indent_level: int =
 
     if isinstance(symbol, nn.Module):
         num_params = get_num_params(symbol)
-        info = num_to_str(num_params) + ' params'
+        info = num_to_str(num_params) + ' trainable params'
         if hasattr(symbol, 'input_shape'):
             flops = get_flops(symbol, gpu)
             info += ', ' + num_to_str(flops) + ' FLOPs'
@@ -73,10 +86,10 @@ def print_symbol_info(symbol: Any, gpu: int, detailed: bool, indent_level: int =
                 print_symbol_info(module, gpu, False, 4)
 
 
-def main(argv) -> None:
+def main(argv: list[str]) -> None:
     args = parse_args(argv)
     if not args.file_path.endswith('.py'):
-        raise ValueError(f'{args.file_path} not a python file.')
+        raise ValueError(f'{args.file_path} not a python file')
 
     module = get_module_from_file(args.file_path)
     for symbol in dir(module):
@@ -88,4 +101,3 @@ def main(argv) -> None:
 
 if __name__ == '__main__':
     main(sys.argv[1:])
-

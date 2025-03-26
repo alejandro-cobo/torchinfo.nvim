@@ -1,19 +1,19 @@
 local uv = vim.uv
 local utils = require("torchinfo.utils")
 
-local torchinfo = {
-    _config = {
-        focus_win = false,
-        gpu = -1,
-        detailed = false
-    }
+local M = {}
+
+local config = {
+    focus_win = false,
+    gpu = -1,
+    detailed = false
 }
 
-function torchinfo.get_info(file_path)
+function M.get_info(file_path)
     local script_path = utils.python_script_path()
 
-    local args = {script_path, file_path, "--gpu", torchinfo._config.gpu}
-    if torchinfo._config.detailed then
+    local args = {script_path, file_path, "--gpu", config.gpu}
+    if config.detailed then
         table.insert(args, "--detailed")
     end
 
@@ -25,18 +25,19 @@ function torchinfo.get_info(file_path)
         args = args,
         stdio = {nil, stdout, stderr}
     },
-    vim.schedule_wrap(function()
-        stdout:read_stop()
-        stderr:read_stop()
-        stdout:close()
-        stderr:close()
-        handle:close()
-        local buf = utils.create_window(#output, torchinfo._config.focus_win)
-        vim.api.nvim_buf_call(buf, function()
-            vim.api.nvim_put(output, "", false, false)
+        vim.schedule_wrap(function()
+            stdout:read_stop()
+            stderr:read_stop()
+            stdout:close()
+            stderr:close()
+            handle:close()
+            local buf = utils.create_window(#output, config.focus_win)
+            vim.api.nvim_buf_call(buf, function()
+                vim.api.nvim_put(output, "", false, false)
+            end)
+            vim.api.nvim_buf_set_option(buf, "modifiable", false)
         end)
-        vim.api.nvim_buf_set_option(buf, "modifiable", false)
-    end))
+    )
 
     uv.read_start(stdout, function(err, data)
         assert(not err, err)
@@ -56,12 +57,11 @@ function torchinfo.get_info(file_path)
     uv.run("once")
 end
 
-function torchinfo.setup(opts)
+function M.setup(opts)
     opts = opts or {}
-    torchinfo._config.focus_win = opts.focus_win
-    torchinfo._config.gpu = opts.gpu or -1
-    torchinfo._config.detailed = opts.detailed
+    config.focus_win = opts.focus_win or config.focus_win
+    config.gpu = opts.gpu or config.gpu
+    config.detailed = opts.detailed or config.detailed
 end
 
-return torchinfo
-
+return M
